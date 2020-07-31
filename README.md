@@ -12,13 +12,17 @@ Es ist empfehlenswert sich eine Verknüpfung auf den z.B. Desktop zu legen.
 Wenn Wurm über Steam installiert wurde, befindet sich der Ordner unter `C:\Program Files\Steam\steamapps\common\Wurm Online` oder 
 in Steam Rechtsklick -> Verwalten -> Lokale Dateien durchsuchen.
 
-In Wurm Online muss die Option `Dump Skills To File` aktiviert sein. Diese wird nach dem Beenden des Spiels geschrieben.
+In Wurm Online muss die Option `Save Skills On Exit` aktiviert sein. Diese wird nach dem Beenden des Spiels geschrieben.
+
+![](https://github.com/MSchmoecker/Wurm-Skill-Collector/blob/master/Docs/WurmSaveSettings.png?raw=true)
 
 ### Ausführung
 Um einen Charakter in die GoogleDocs Tabelle zu übertragen muss der Name vorher in der Tabelle existieren.
 
 Im Ordner muss die Datei ausgeführt werden, Windows sollte dabei keine Rechte anfordern. Daraufhin wird versucht den aktuellsten Log zu finden und in die Tabelle zu schreiben. 
 Das Programm läuft nur einmal und muss bei erneutem schreiben neu ausgeführt werden.
+
+![](https://github.com/MSchmoecker/Wurm-Skill-Collector/blob/master/Docs/ProgramSample.png?raw=true)
 
 ## Entwicklung
 
@@ -30,7 +34,7 @@ Das Programm läuft nur einmal und muss bei erneutem schreiben neu ausgeführt w
   - unter https://console.developers.google.com/apis/credentials muss ein Service-Worker (Dienstkonto) erstellt werden.
   Es muss ein Key erstellt werden und die Json Datei runtergeladen werden. Diese muss in dem Projekt unter `service_account.json` 
   gespeichert werden.
-  - Die E-Mail des Service-Workers muss in der Google Tabelle als Person freigegeben werden. Ein öffentlicher Link ist nicht ausreichent.
+  - Die E-Mail des Service-Workers muss in der Google Tabelle als Person freigegeben werden. Ein öffentlicher Link ist nicht ausreichend.
 
 Um das Programm in Python zu testen muss der `players_path` überschrieben werden.
 Das Programm kann nun ausgeführt werden.
@@ -45,7 +49,7 @@ pyinstaller -n WurmSkillCollector --onefile --add-data "service_account.json;." 
 
 #### Google
 Das Programm nutzt einen Service-Worker welcher auf 100 Lesevorgänge pro 100 Sekunden begrenzt ist. Da 2 Mal gelesen werden muss, 
-können nur 50 Spieler in 100 Sekunden die Tabelle beschreiben. Das Tageskontigent ist unlimitiert, versucht es einfach später erneut.
+können nur 50 Spieler in 100 Sekunden die Tabelle beschreiben. Das Tageskontingent ist unlimitiert, versucht es einfach später erneut.
 Sollte es öfters zu Problemen kommen, sprecht mich an.
 
 
