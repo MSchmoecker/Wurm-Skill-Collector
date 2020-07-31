@@ -8,10 +8,11 @@ from oauth2client.service_account import ServiceAccountCredentials
 import sys
 from configparser import ConfigParser
 
-
+print("Starte", end="")
 bundle_dir = getattr(sys, '_MEIPASS', path.abspath(path.dirname(__file__)))
 CONFIG = ConfigParser()
 CONFIG.read(os.path.join(bundle_dir, "config.ini"))
+print("...")
 
 
 def main():
@@ -65,7 +66,10 @@ def main():
                 new_values.append([cur_skill])
 
                 if old_values.__len__() > i:
-                    if cur_skill - float(old_values[i].replace(",", ".")) != 0:
+                    try:
+                        if cur_skill - float(old_values[i].replace(",", ".")) != 0:
+                            updated_skills.append((skill_names[i], old_values[i], cur_skill))
+                    except Exception as e:
                         updated_skills.append((skill_names[i], old_values[i], cur_skill))
                 else:
                     updated_skills.append((skill_names[i], 0, cur_skill))
@@ -133,7 +137,7 @@ def extract_skills(skill_path):
 
 def end_program(reason="", exit_code=0):
     if reason != "":
-        print(reason, 'red')
+        print(reason)
     print("\n\nDrücke eine Taste zum beenden...")
     input()
     sys.exit(exit_code)
