@@ -1,0 +1,13 @@
+static
+templates
+venv
+
+build
+dist
+
+config.ini
+service_account.json
+*.spec
+
+.idea/
+__pycache__/
