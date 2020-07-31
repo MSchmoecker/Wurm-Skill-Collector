@@ -43,7 +43,7 @@ Das Programm kann nun ausgeführt werden.
 Um das Projekt zu builden wird pyinstaller (https://pyinstaller.readthedocs.io) genutzt.
 Der Erstellungbefehl ist:
 ```
-pyinstaller -n WurmSkillCollector --onefile --add-data "service_account.json;." --add-data "config.ini;." main.py
+pyinstaller WurmSkillCollector.spec -n WurmSkillCollector --onefile
 ```
 
 ## Fehler
@@ -60,4 +60,4 @@ Verbinde zu GoogleDocs...
 ```
 
 #### Fehler
-Sollte ein Fehler auftreten, nutzt bitte den Issue-Tracker von Github.
+Sollte ein größerer Fehler auftreten, nutzt bitte den Issue-Tracker von Github.
