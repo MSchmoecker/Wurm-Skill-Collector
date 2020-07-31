@@ -11,14 +11,14 @@ Die `WurmSkillCollector.exe` muss heruntergeladen und in folgende Ordner geschob
 in Steam Rechtsklick -> Verwalten -> Lokale Dateien durchsuchen.
 - Wenn der Alte Client benutzt wird, liegt der Pfad bei `C:\Users\USER\Wurm` oder in AppData. 
 
-Es ist empfehlenswert sich eine Verknüpfung auf den z.B. Desktop zu legen.
+Es ist empfehlenswert sich eine Verknüpfung auf z.B. den Desktop zu legen.
 
 In Wurm Online muss die Option `Save Skills On Exit` aktiviert sein. Diese wird nach dem Beenden des Spiels geschrieben.
 
 ![](https://github.com/MSchmoecker/Wurm-Skill-Collector/blob/master/Docs/WurmSaveSettings.png?raw=true)
 
 ### Ausführung
-Um einen Charakter in die GoogleDocs Tabelle zu übertragen muss der Name vorher in der Tabelle existieren.
+Um einen Charakter in die GoogleDocs Tabelle zu übertragen muss der Name vorher **exakt** wie im Spiel in der Tabelle existieren.
 
 Im Ordner muss die Datei ausgeführt werden. Daraufhin wird versucht den aktuellsten Log zu finden und in die Tabelle zu schreiben. 
 Das Programm läuft nur einmal und muss bei erneutem schreiben neu ausgeführt werden.
