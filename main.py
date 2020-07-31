@@ -16,12 +16,15 @@ CONFIG.read(os.path.join(bundle_dir, "config.ini"))
 
 def main():
     try:
-        players_path = os.path.dirname(os.path.realpath(__file__)) + "/gamedata/players"
+        data_path = os.path.dirname(os.path.realpath(__file__))
         # Überschreibe den players_path mit den Installationsordner um lokal testen zu können
-        # players_path = '%/Wurm Online/gamedata/players
+        # data_path = "%/Wurm Online/gamedata/players"
 
         print("Suche nach Dateien...\n")
-        player, log_path, date = search_for_newest_log(players_path)
+        player, log_path, date = search_for_newest_log(data_path + "/gamedata/players")
+
+        if player == "":
+            player, log_path, date = search_for_newest_log(data_path + "/players")
 
         if player == "":
             end_program("Keine Skilldateien gefunden!")
@@ -77,21 +80,22 @@ def search_for_newest_log(players_path):
     player_name = ""
     player_log = (datetime.min, "")
 
-    for player_folder in listdir(players_path):
-        full_player_path = join(players_path, player_folder)
-        full_dumps_path = join(full_player_path, "dumps")
+    if exists(players_path):
+        for player_folder in listdir(players_path):
+            full_player_path = join(players_path, player_folder)
+            full_dumps_path = join(full_player_path, "dumps")
 
-        if not isdir(full_player_path):
-            continue
-        if not exists(full_dumps_path):
-            continue
-        logs = [log.replace("skills.", "").replace(".txt", "") for log in listdir(full_dumps_path)
-                if (isfile(join(full_dumps_path, log)) and log.startswith("skills"))]
-        times = [(datetime.strptime(log, "%Y%m%d.%H%M"), log) for log in logs]
-        times.sort(reverse=True)
-        if times.__len__() > 0 and times[0][0] > player_log[0]:
-            player_name = player_folder
-            player_log = times[0]
+            if not isdir(full_player_path):
+                continue
+            if not exists(full_dumps_path):
+                continue
+            logs = [log.replace("skills.", "").replace(".txt", "") for log in listdir(full_dumps_path)
+                    if (isfile(join(full_dumps_path, log)) and log.startswith("skills"))]
+            times = [(datetime.strptime(log, "%Y%m%d.%H%M"), log) for log in logs]
+            times.sort(reverse=True)
+            if times.__len__() > 0 and times[0][0] > player_log[0]:
+                player_name = player_folder
+                player_log = times[0]
 
     return player_name, join(players_path, player_name, "dumps", "skills." + player_log[1] + ".txt"), player_log[0]
 

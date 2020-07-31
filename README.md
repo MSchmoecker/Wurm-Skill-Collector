@@ -6,11 +6,12 @@ Aktuell muss die Tabelle auf das Projekt angepasst sein.
 ## Anwendung
 ### Einrichtung
 Das Programm ist ein Single-File-Executable, weshalb diese nicht installiert werden muss.
-Die `WurmSkillCollector.exe` muss heruntergeladen und in den Installationsordner von Wurm Online verschoben werden.
-Es ist empfehlenswert sich eine Verknüpfung auf den z.B. Desktop zu legen.
-
-Wenn Wurm über Steam installiert wurde, befindet sich der Ordner unter `C:\Program Files\Steam\steamapps\common\Wurm Online` oder 
+Die `WurmSkillCollector.exe` muss heruntergeladen und in folgende Ordner geschoben werden:
+- Wenn Wurm über Steam installiert wurde, befindet sich der Ordner unter `C:\Program Files\Steam\steamapps\common\Wurm Online` oder 
 in Steam Rechtsklick -> Verwalten -> Lokale Dateien durchsuchen.
+- Wenn der Alte Client benutzt wird, liegt der Pfad bei `C:\Users\USER\Wurm` oder in AppData. 
+
+Es ist empfehlenswert sich eine Verknüpfung auf den z.B. Desktop zu legen.
 
 In Wurm Online muss die Option `Save Skills On Exit` aktiviert sein. Diese wird nach dem Beenden des Spiels geschrieben.
 
@@ -19,7 +20,7 @@ In Wurm Online muss die Option `Save Skills On Exit` aktiviert sein. Diese wird 
 ### Ausführung
 Um einen Charakter in die GoogleDocs Tabelle zu übertragen muss der Name vorher in der Tabelle existieren.
 
-Im Ordner muss die Datei ausgeführt werden, Windows sollte dabei keine Rechte anfordern. Daraufhin wird versucht den aktuellsten Log zu finden und in die Tabelle zu schreiben. 
+Im Ordner muss die Datei ausgeführt werden. Daraufhin wird versucht den aktuellsten Log zu finden und in die Tabelle zu schreiben. 
 Das Programm läuft nur einmal und muss bei erneutem schreiben neu ausgeführt werden.
 
 ![](https://github.com/MSchmoecker/Wurm-Skill-Collector/blob/master/Docs/ProgramSample.png?raw=true)
