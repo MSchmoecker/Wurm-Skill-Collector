@@ -18,7 +18,7 @@ def main():
     try:
         data_path = os.path.dirname(os.path.realpath(__file__))
         # Überschreibe den players_path mit den Installationsordner um lokal testen zu können
-        # data_path = "%/Wurm Online/gamedata/players"
+        # data_path = "%/Wurm Online"
 
         print("Suche nach Dateien...\n")
         player, log_path, date = search_for_newest_log(data_path + "/gamedata/players")
@@ -57,10 +57,18 @@ def main():
         old_values = [row[player_index] for row in all_values]
 
         new_values = []
+        updated_skills = []
 
         for i in range(len(skill_names)):
             if skill_names.__len__() > i and skills.__contains__(skill_names[i].lower()):
-                new_values.append([round(float(skills[skill_names[i].lower()]) * 100) / 100])
+                cur_skill = round(float(skills[skill_names[i].lower()]) * 100) / 100
+                new_values.append([cur_skill])
+
+                if old_values.__len__() > i:
+                    if cur_skill - float(old_values[i].replace(",", ".")) != 0:
+                        updated_skills.append((skill_names[i], old_values[i], cur_skill))
+                else:
+                    updated_skills.append((skill_names[i], 0, cur_skill))
             elif old_values.__len__() > i:
                 new_values.append([old_values[i]])
             else:
@@ -72,8 +80,19 @@ def main():
         print(e)
         end_program("", -1)
     else:
-        print("Schreiben erfolgreich!")
+        if updated_skills.__len__() > 0:
+            print("Geänderte Skills:")
+            for skill in updated_skills:
+                whitespaces = " " * max(1, 25 - len(skill[0]))
+                print("\t" + skill[0] + ": " + whitespaces + to_number(skill[1]) + " -> " + to_number(skill[2]))
+        else:
+            print("Keine geänderten skills")
+        print("\nSchreiben erfolgreich!")
         end_program()
+
+
+def to_number(value):
+    return str(value).replace(".", ",")
 
 
 def search_for_newest_log(players_path):
