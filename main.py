@@ -105,7 +105,7 @@ def to_number(value):
 
 
 def search_for_newest_log(wurm_path, player_search=None):
-    paths = ["gamedata/players", "players"]
+    paths = ["gamedata/players", "players", "../gamedata/players", "../players"]
     player_name = ""
     player_log = (datetime.min, "")
     player_path = ""
