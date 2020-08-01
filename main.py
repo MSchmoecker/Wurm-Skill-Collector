@@ -136,7 +136,7 @@ def search_for_newest_log(wurm_path, player_search=None):
                     player_name = player_folder
                     player_log = times[0]
                     player_path = full_cur_path
-    return player_name, join(player_path, player_name, "dumps", "skills." + player_log[1] + ".txt").replace("\\", "/"), player_log[0]
+    return player_name.lower(), join(player_path, player_name, "dumps", "skills." + player_log[1] + ".txt").replace("\\", "/"), player_log[0]
 
 
 def extract_skills(skill_path):
