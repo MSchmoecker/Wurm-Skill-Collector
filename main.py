@@ -114,7 +114,12 @@ def search_for_newest_log(players_path):
                 continue
             logs = [log.replace("skills.", "").replace(".txt", "") for log in listdir(full_dumps_path)
                     if (isfile(join(full_dumps_path, log)) and log.startswith("skills"))]
-            times = [(datetime.strptime(log, "%Y%m%d.%H%M"), log) for log in logs]
+            times = []
+            for log in logs:
+                try:
+                    times.append((datetime.strptime(log.strip(), "%Y%m%d.%H%M"), log))
+                except Exception as e:
+                    pass
             times.sort(reverse=True)
             if times.__len__() > 0 and times[0][0] > player_log[0]:
                 player_name = player_folder
