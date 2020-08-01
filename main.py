@@ -50,7 +50,9 @@ def main():
         all_values = sheet.get_all_values()
 
         skill_names = [row[3] if row[3] > row[2] else row[2] for row in all_values]
-        names = all_values[4]
+        names = []
+        for single_name in all_values[4]:
+            names.append(single_name.lower())
 
         if not names.__contains__(player):
             end_program("Spieler nicht in der Tabelle gefunden!")
