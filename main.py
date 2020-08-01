@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 import os
 from os import listdir, path
@@ -6,26 +7,28 @@ import gspread
 from gspread import utils
 from oauth2client.service_account import ServiceAccountCredentials
 import sys
-from configparser import ConfigParser
 
-print("Starte", end="")
-bundle_dir = getattr(sys, '_MEIPASS', path.abspath(path.dirname(__file__)))
-CONFIG = ConfigParser()
-CONFIG.read(os.path.join(bundle_dir, "config.ini"))
-print("...")
+data_path = os.path.dirname(os.path.realpath(__file__))
+# data_path = "E:/Programme/Steam/steamapps/common/Wurm Online"
+
+
+def init():
+    config_path = join(data_path, "SkillCollectorConfig.json")
+    if not exists(config_path):
+        end_program("SkillCollectorConfig.json nicht gefunden")
+    else:
+        print("SkillCollectorConfig.json wurde geladen")
+    with open(config_path, 'r', encoding='utf-8') as data:
+        return json.load(data)
+
+
+config = init()
 
 
 def main():
     try:
-        data_path = os.path.dirname(os.path.realpath(__file__))
-        # Überschreibe den players_path mit den Installationsordner um lokal testen zu können
-        # data_path = "%/Wurm Online"
-
         print("Suche nach Dateien...\n")
-        player, log_path, date = search_for_newest_log(data_path + "/gamedata/players")
-
-        if player == "":
-            player, log_path, date = search_for_newest_log(data_path + "/players")
+        player, log_path, date = search_for_newest_log(data_path)
 
         if player == "":
             end_program("Keine Skilldateien gefunden!")
@@ -39,10 +42,10 @@ def main():
         print("\nVerbinde zu GoogleDocs...")
 
         scope = ['https://www.googleapis.com/auth/spreadsheets']
-        service_account_path = path.join(bundle_dir, 'service_account.json')
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(service_account_path, scope)
+        worker = config["service_worker"]
+        credentials = ServiceAccountCredentials._from_parsed_json_keyfile(worker, scope)
         client = gspread.authorize(credentials)
-        sheet = client.open_by_key(CONFIG['GoogleDocs']["sheet_id"]).worksheet("Fähigkeiten")
+        sheet = client.open_by_key(config["sheet_id"]).worksheet(config["worksheet_name"])
 
         all_values = sheet.get_all_values()
 
@@ -99,33 +102,39 @@ def to_number(value):
     return str(value).replace(".", ",")
 
 
-def search_for_newest_log(players_path):
+def search_for_newest_log(wurm_path, player_search=None):
+    paths = ["gamedata/players", "players"]
     player_name = ""
     player_log = (datetime.min, "")
+    player_path = ""
 
-    if exists(players_path):
-        for player_folder in listdir(players_path):
-            full_player_path = join(players_path, player_folder)
-            full_dumps_path = join(full_player_path, "dumps")
+    for cur_path in paths:
+        full_cur_path = join(wurm_path, cur_path)
+        if exists(full_cur_path):
+            for player_folder in listdir(full_cur_path):
+                full_player_path = join(full_cur_path, player_folder)
+                full_dumps_path = join(full_player_path, "dumps")
 
-            if not isdir(full_player_path):
-                continue
-            if not exists(full_dumps_path):
-                continue
-            logs = [log.replace("skills.", "").replace(".txt", "") for log in listdir(full_dumps_path)
-                    if (isfile(join(full_dumps_path, log)) and log.startswith("skills"))]
-            times = []
-            for log in logs:
-                try:
-                    times.append((datetime.strptime(log.strip(), "%Y%m%d.%H%M"), log))
-                except Exception as e:
-                    pass
-            times.sort(reverse=True)
-            if times.__len__() > 0 and times[0][0] > player_log[0]:
-                player_name = player_folder
-                player_log = times[0]
-
-    return player_name, join(players_path, player_name, "dumps", "skills." + player_log[1] + ".txt"), player_log[0]
+                if player_search is not None and player_folder != player_search:
+                    continue
+                if not isdir(full_player_path):
+                    continue
+                if not exists(full_dumps_path):
+                    continue
+                logs = [log.replace("skills.", "").replace(".txt", "") for log in listdir(full_dumps_path)
+                        if (isfile(join(full_dumps_path, log)) and log.startswith("skills"))]
+                times = []
+                for log in logs:
+                    try:
+                        times.append((datetime.strptime(log.strip(), "%Y%m%d.%H%M"), log))
+                    except Exception as e:
+                        pass
+                times.sort(reverse=True)
+                if times.__len__() > 0 and times[0][0] > player_log[0]:
+                    player_name = player_folder
+                    player_log = times[0]
+                    player_path = full_cur_path
+    return player_name, join(player_path, player_name, "dumps", "skills." + player_log[1] + ".txt").replace("\\", "/"), player_log[0]
 
 
 def extract_skills(skill_path):
