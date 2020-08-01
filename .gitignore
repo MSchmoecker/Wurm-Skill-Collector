@@ -5,8 +5,5 @@ venv
 build
 dist
 
-config.ini
-service_account.json
-
 .idea/
 __pycache__/
