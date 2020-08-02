@@ -21,9 +21,6 @@ def init():
         return json.load(data)
 
 
-config = init()
-
-
 def main():
     try:
         print("Suche nach Dateien...\n")
@@ -159,4 +156,5 @@ def end_program(reason="", exit_code=0):
     sys.exit(exit_code)
 
 
+config = init()
 main()
