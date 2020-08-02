@@ -79,9 +79,9 @@ def main():
                 else:
                     updated_skills.append((skill_names[i], 0, cur_skill))
             elif old_values.__len__() > i:
-                new_values.append([old_values[i]])
+                new_values.append([])
             else:
-                new_values.append([""])
+                new_values.append([])
 
         print("Schreibe Daten in die Tabelle...")
         sheet.update(player_cell, new_values)
