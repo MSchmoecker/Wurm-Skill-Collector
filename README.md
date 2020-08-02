@@ -11,7 +11,8 @@ Die `WurmSkillCollector.exe` muss heruntergeladen und in folgende Ordner geschob
 in Steam Rechtsklick -> Verwalten -> Lokale Dateien durchsuchen.
 - Wenn der Alte Client benutzt wird, liegt der Pfad bei `C:\Users\USER\Wurm` oder in AppData. 
 
-Es ist empfehlenswert sich eine Verknüpfung auf z.B. den Desktop zu legen.
+Eine `SkillCollectorConfig.json` muss angelegt und ausgefüllt werden. Eine Beipieldatei befindet sich im Repository.<br>
+Es ist empfehlenswert sich eine Verknüpfung auf den Desktop zu legen.
 
 In Wurm Online muss die Option `Save Skills On Exit` aktiviert sein. Diese wird nach dem Beenden des Spiels geschrieben.
 
@@ -26,19 +27,18 @@ Das Programm läuft nur einmal und muss bei erneutem schreiben neu ausgeführt w
 ![](https://github.com/MSchmoecker/Wurm-Skill-Collector/blob/master/Docs/ProgramSample.png?raw=true)
 
 ## Entwicklung
-
-- Um das Python Script auszuführen muss die `config.ini.sample` kopiert und zu `config.ini` umbenannt werden. 
-- Die sheet_id von dem GoogleDocs muss eingetragen werden (diese kann aus der Url kopiert werden). 
+- Das Repository muss in den Wurm Online Ordner geklont werden
+- Um das Python Script auszuführen muss die `SkillCollectorConfigSample.json` kopiert und zu `SkillCollectorConfig.json` umbenannt werden. Dort 
+- Die sheet_id und worksheet_name von dem GoogleDocs muss eingetragen werden (die sheet_id kann aus der Url kopiert werden). 
 - Es wird ein Google Developer Account benötigt um das schreiben auf Docs zu ermöglichen.
   - unter https://console.developers.google.com sollte ein neues Projekt erstellt werden
-  - unter https://console.developers.google.com/apis/library muss der Dienst Google Sheets API muss aktiviert werden.
   - unter https://console.developers.google.com/apis/credentials muss ein Service-Worker (Dienstkonto) erstellt werden.
   Es muss ein Key erstellt werden und die Json Datei runtergeladen werden. Diese muss in dem Projekt unter `service_account.json` 
   gespeichert werden.
+  - der Inhalt der Json Datei muss in die `SkillCollectorConfig` eingetragen werden
   - Die E-Mail des Service-Workers muss in der Google Tabelle als Person freigegeben werden. Ein öffentlicher Link ist nicht ausreichend.
 
-Um das Programm in Python zu testen muss der `players_path` überschrieben werden.
-Das Programm kann nun ausgeführt werden.
+Die `main.py` kann nun ausgeführt werden.
 
 Um das Projekt zu builden wird pyinstaller (https://pyinstaller.readthedocs.io) genutzt.
 Der Erstellungbefehl ist:
