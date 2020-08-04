@@ -29,7 +29,7 @@ def main():
         if player == "":
             end_program("Keine Skilldateien gefunden!")
 
-        print("Neuste Skills von '" + player + "' am '" + str(date) + "' gefunden")
+        print("Neuste Skills von '" + player.capitalize() + "' am '" + str(date) + "' gefunden")
         skills = extract_skills(log_path)
 
         if skills.__len__() == 0:
