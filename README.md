@@ -1,63 +1,64 @@
 # Wurm Online Skill Collector
-## Allgemein
-Das Projekt ist ein einfaches Programm, welches die Spieler Skills aus Wurm Online in eine Google Docs Tablelle schreibt. 
-Aktuell muss die Tabelle auf das Projekt angepasst sein.
+## Overview
+This is a simple python program which collects the skills from a Wurm Online Account and writes those to a Google Docs table. 
+The table must be adjusted to work with the tool.
 
-## Anwendung
-### Einrichtung
-Das Programm ist ein Single-File-Executable, weshalb diese nicht installiert werden muss.
-Die `WurmSkillCollector.exe` muss heruntergeladen und in folgende Ordner geschoben werden:
-- Wenn Wurm über Steam installiert wurde, befindet sich der Ordner unter `C:\Program Files\Steam\steamapps\common\Wurm Online` oder 
-in Steam Rechtsklick -> Verwalten -> Lokale Dateien durchsuchen.
-- Wenn der Alte Client benutzt wird, liegt der Pfad bei `C:\Users\USER\Wurm` oder in AppData. 
+## Usage
+### Program setup
+The program is a single-file-executable and therefore nothing must be installed. The `WurmSkillCollector.exe` has to be downloaded
+and put in one of the following folders:
+- If the Wurm Online Steam version is used: `C:\Program Files\Steam\steamapps\common\Wurm Online`
+- If the old Wurm client is used: `C:\Users\USER\Wurm` or AppData if it doesn’t exists
 
-Eine `SkillCollectorConfig.json` muss angelegt und ausgefüllt werden. Eine Beipieldatei befindet sich im Repository.<br>
-Es ist empfehlenswert sich eine Verknüpfung auf den Desktop zu legen.
+A `SkillCollectorConfig.json` must be created and all values must be passed. An example file is in the repository (`SkillCollectorConfigSample.json`).
+It is recommended to link the tool to a desktop shortcut to the .exe file.
 
-In Wurm Online muss die Option `Save Skills On Exit` aktiviert sein. Diese wird nach dem Beenden des Spiels geschrieben.
+It is possible to put those both files (.exe and .json) directly in the Wurm folder or in a subfolder.
+
+### Wurm Online setup
+In order to collect the skills from a file, the option `Save Skills On Exit` has to be activated in Wurm. It only saves the skills when Wurm closes.
 
 ![](https://github.com/MSchmoecker/Wurm-Skill-Collector/blob/master/Docs/WurmSaveSettings.png?raw=true)
 
-### Ausführung
-Um einen Charakter in die GoogleDocs Tabelle zu übertragen muss der Name vorher **exakt** wie im Spiel in der Tabelle existieren.
 
-Im Ordner muss die Datei ausgeführt werden. Daraufhin wird versucht den aktuellsten Log zu finden und in die Tabelle zu schreiben. 
-Das Programm läuft nur einmal und muss bei erneutem schreiben neu ausgeführt werden.
+### Google table setup
+All skills have to be in the column ``$C:$D`` (only one skill per row, you can use merged cells for parent skills).
+All names have to be in the row `5`. Example:
+
+<img src="https://github.com/MSchmoecker/Wurm-Skill-Collector/blob/master/Docs/GoogleTable.png?raw=true" width="50%" />
+
+### Execution
+Before the tool runs, the player name has to be written **exactly** like the ingame name to the Google table.
 
 ![](https://github.com/MSchmoecker/Wurm-Skill-Collector/blob/master/Docs/ProgramSample.png?raw=true)
 
-## Entwicklung
-- Das Repository muss in den Wurm Online Ordner geklont werden
-- Um das Python Script auszuführen muss die `SkillCollectorConfigSample.json` kopiert und zu `SkillCollectorConfig.json` umbenannt werden. Dort 
-- Die sheet_id und worksheet_name von dem GoogleDocs muss eingetragen werden (die sheet_id kann aus der Url kopiert werden). 
-- Es wird ein Google Developer Account benötigt um das schreiben auf Docs zu ermöglichen.
-  - unter https://console.developers.google.com sollte ein neues Projekt erstellt werden
-  - unter https://console.developers.google.com/apis/credentials muss ein Service-Worker (Dienstkonto) erstellt werden.
-  Es muss ein Key erstellt werden und die Json Datei runtergeladen werden. Diese muss in dem Projekt unter `service_account.json` 
-  gespeichert werden.
-  - der Inhalt der Json Datei muss in die `SkillCollectorConfig` eingetragen werden
-  - Die E-Mail des Service-Workers muss in der Google Tabelle als Person freigegeben werden. Ein öffentlicher Link ist nicht ausreichend.
+The program can now be executed. It tries to find the newest log and write the the skill values to the table.
+The tool only runs once and has to be started manually every time new skills are collected in Wurm.
 
-Die `main.py` kann nun ausgeführt werden.
+## Development
+### Setup
+1. The repository must be cloned into the Wurm Online folder as described above
+2. A `SkillCollectorConfig.json` must be created and all values must be passed. An example file is in the repository (`SkillCollectorConfigSample.json`).
+	- the `sheet_id` can be copied from the url line.
+	- the `worksheet_name` is the worksheet where all skills are stored.
+	- under https://console.developers.google.com should a new project be created.
+	- under https://console.developers.google.com/apis/credentials should a new service-worker be created. A new key should be 
+	generated and the json must be downloaded. The data of the service-worker must be passed into the `SkillCollectorConfig.json` file.
+    **The document must be shared to the e-mail of the worker.** A public link is not sufficient.
 
-Um das Projekt zu builden wird pyinstaller (https://pyinstaller.readthedocs.io) genutzt.
-Der Erstellungbefehl ist:
+The `main.py` may now be executed.
+
+### Building
+To build the project, pyinstaller is used (https://pyinstaller.readthedocs.io).
+The command is:
 ```
 pyinstaller WurmSkillCollector.spec -n WurmSkillCollector --onefile
 ```
 
-## Fehler
+## Troubleshooting
+### Google
+The program uses a service-worker which only grands 100 read requests in 100 seconds. It uses 2 read requests for one execution, 
+so only 50 Players can write to the table in 100 seconds. The daily limit, however, is not limited.
 
-#### Google
-Das Programm nutzt einen Service-Worker welcher auf 100 Lesevorgänge pro 100 Sekunden begrenzt ist. Da 2 Mal gelesen werden muss, 
-können nur 50 Spieler in 100 Sekunden die Tabelle beschreiben. Das Tageskontingent ist unlimitiert, versucht es einfach später erneut.
-Sollte es öfters zu Problemen kommen, sprecht mich an.
-
-
-```
-Verbinde zu GoogleDocs...
-{'code': 429, 'message': "Quota exceeded for quota group 'ReadGroup' and limit 'Read requests per user per 100 seconds' of service 'sheets.googleapis.com' for consumer 'project_number:'.", 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Google developer console API key'}]}]}
-```
-
-#### Fehler
-Sollte ein größerer Fehler auftreten, nutzt bitte den Issue-Tracker von Github.
+### Other errors
+Please use the Github bug tracker if an error occurs.
