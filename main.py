@@ -14,28 +14,28 @@ data_path = os.path.dirname(os.path.realpath(__file__))
 def init():
     config_path = join(data_path, "SkillCollectorConfig.json")
     if not exists(config_path):
-        end_program("SkillCollectorConfig.json nicht gefunden")
+        end_program("SkillCollectorConfig.json not found")
     else:
-        print("SkillCollectorConfig.json wurde geladen")
+        print("SkillCollectorConfig.json loaded")
     with open(config_path, 'r', encoding='utf-8') as data:
         return json.load(data)
 
 
 def main():
     try:
-        print("Suche nach Dateien...\n")
+        print("Search for skill files..\n")
         player, log_path, date = search_for_newest_log(data_path)
 
         if player == "":
-            end_program("Keine Skilldateien gefunden!")
+            end_program("No skill files found!")
 
-        print("Neuste Skills von '" + player.capitalize() + "' am '" + str(date) + "' gefunden")
+        print("Newest skills for '" + player.capitalize() + "' at '" + str(date) + "' found")
         skills = extract_skills(log_path)
 
         if skills.__len__() == 0:
-            end_program("Keine Skills in der Datei gefunden!")
+            end_program("No skills found inside the file!")
 
-        print("\nVerbinde zu GoogleDocs...")
+        print("\nConnect to GoogleDocs...")
 
         scope = ['https://www.googleapis.com/auth/spreadsheets']
         worker = config["service_worker"]
@@ -51,9 +51,9 @@ def main():
             names.append(single_name.lower())
 
         if not names.__contains__(player):
-            end_program("Spieler nicht in der Tabelle gefunden!")
+            end_program("Player name not found inside the table! (Row 5)")
 
-        print("Bereite Daten vor...")
+        print("Preparing data...")
         player_index = names.index(player)
         player_cell = utils.rowcol_to_a1(1, player_index + 1)
         old_values = [row[player_index] for row in all_values]
@@ -74,25 +74,23 @@ def main():
                         updated_skills.append((skill_names[i], old_values[i], cur_skill))
                 else:
                     updated_skills.append((skill_names[i], 0, cur_skill))
-            elif old_values.__len__() > i:
-                new_values.append([])
             else:
                 new_values.append([])
 
-        print("Schreibe Daten in die Tabelle...")
+        print("Write data in the table...")
         sheet.update(player_cell, new_values)
     except Exception as e:
         print(e)
         end_program("", -1)
     else:
         if updated_skills.__len__() > 0:
-            print("Geänderte Skills:")
+            print("Changed skills:")
             for skill in updated_skills:
                 whitespaces = " " * max(1, 25 - len(skill[0]))
                 print("\t" + skill[0] + ": " + whitespaces + to_number(skill[1]) + " -> " + to_number(skill[2]))
         else:
-            print("Keine geänderten skills")
-        print("\nSchreiben erfolgreich!")
+            print("No skills changed")
+        print("\nWriting successful!")
         end_program()
 
 
@@ -100,7 +98,7 @@ def to_number(value):
     return str(value).replace(".", ",")
 
 
-def search_for_newest_log(wurm_path, player_search=None):
+def search_for_newest_log(wurm_path, player_search=None) -> (str, str, datetime):
     paths = ["gamedata/players", "players", "../gamedata/players", "../players"]
     player_name = ""
     player_log = (datetime.min, "")
@@ -132,8 +130,9 @@ def search_for_newest_log(wurm_path, player_search=None):
                     player_name = player_folder
                     player_log = times[0]
                     player_path = full_cur_path
-    return player_name.lower(), join(player_path, player_name, "dumps", "skills." + player_log[1] + ".txt").replace("\\", "/"), \
-           player_log[0]
+
+    log_path = join(player_path, player_name, "dumps", "skills." + player_log[1] + ".txt").replace("\\", "/")
+    return player_name.lower(), log_path, player_log[0]
 
 
 def extract_skills(skill_path):
@@ -151,7 +150,7 @@ def extract_skills(skill_path):
 def end_program(reason="", exit_code=0):
     if reason != "":
         print(reason)
-    print("\n\nDrücke eine Taste zum beenden...")
+    print("\n\nPress enter to quit...")
     input()
     sys.exit(exit_code)
 
