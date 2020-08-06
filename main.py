@@ -23,13 +23,13 @@ def init():
 
 def main():
     try:
-        print("Search for skill files..\n")
+        print("Search for skill files...\n")
         player, log_path, date = search_for_newest_log(data_path)
 
         if player == "":
             end_program("No skill files found!")
 
-        print("Newest skills for '" + player.capitalize() + "' at '" + str(date) + "' found")
+        print("Latest skills for '" + player.capitalize() + "' at '" + str(date) + "' found")
         skills = extract_skills(log_path)
 
         if skills.__len__() == 0:
@@ -77,7 +77,7 @@ def main():
             else:
                 new_values.append([])
 
-        print("Write data in the table...")
+        print("Write data into the table...")
         sheet.update(player_cell, new_values)
     except Exception as e:
         print(e)
