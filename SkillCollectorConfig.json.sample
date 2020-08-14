@@ -1,6 +1,7 @@
 {
   "sheet_id": "",
   "worksheet_name" : "",
+  "players": [],
   "service_worker": {
 	  "type": "service_account",
 	  "project_id": "",

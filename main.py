@@ -21,19 +21,46 @@ def init():
         return json.load(data)
 
 
+class Player:
+    def __init__(self, player_name, log_path, date, found):
+        self.player_name = player_name
+        self.player_name_print = player_name.capitalize()
+        self.log_path = log_path
+        self.date = date
+        self.found = found
+    player_name: ""
+
+
 def main():
     try:
         print("Search for skill files...\n")
-        player, log_path, date = search_for_newest_log(data_path)
 
-        if player == "":
-            end_program("No skill files found!")
+        if config.__contains__("players"):
+            player_names = config["players"]
+        else:
+            player_names = None
 
-        print("Latest skills for '" + player.capitalize() + "' at '" + str(date) + "' found")
-        skills = extract_skills(log_path)
+        if player_names is None or player_names.__len__() == 0:
+            players = [search_for_newest_log(data_path)]
+        else:
+            players = [search_for_newest_log(data_path, player_name) for player_name in player_names]
 
-        if skills.__len__() == 0:
-            end_program("No skills found inside the file!")
+        any_found = False
+        for player in players:
+            if player.found:
+                print("Latest skills for '" + player.player_name_print + "' on '" + str(player.date) + "' found")
+                player.skills = extract_skills(player.log_path)
+
+                if player.skills.__len__() == 0:
+                    print("\tNo skills found inside the file!")
+                    player.found = False
+                else:
+                    any_found = True
+            elif player.player_name is not None:
+                print("No skill file found for '" + player.player_name_print + "'")
+
+        if not any_found:
+            end_program("\nNo skill files found!")
 
         print("\nConnect to GoogleDocs...")
 
@@ -50,55 +77,59 @@ def main():
         for single_name in all_values[4]:
             names.append(single_name.lower())
 
-        if not names.__contains__(player):
-            end_program("Player name not found inside the table! (Row 5)")
+        for player in players:
+            if not player.found:
+                continue
+            if not names.__contains__(player.player_name):
+                print("Player '" + player.player_name_print + " not found inside the table! (Row 5)")
+                continue
 
-        print("Preparing data...")
-        player_index = names.index(player)
-        player_cell = utils.rowcol_to_a1(1, player_index + 1)
-        old_values = [row[player_index] for row in all_values]
+            print("\nPreparing data...")
+            player_index = names.index(player.player_name)
+            player_cell = utils.rowcol_to_a1(1, player_index + 1)
+            old_values = [row[player_index] for row in all_values]
 
-        new_values = []
-        updated_skills = []
+            new_values = []
+            updated_skills = []
 
-        for i in range(len(skill_names)):
-            if skill_names.__len__() > i and skills.__contains__(skill_names[i].lower()):
-                cur_skill = round(float(skills[skill_names[i].lower()]) * 100) / 100
-                new_values.append([cur_skill])
+            for i in range(len(skill_names)):
+                if skill_names.__len__() > i and player.skills.__contains__(skill_names[i].lower()):
+                    cur_skill = round(float(player.skills[skill_names[i].lower()]) * 100) / 100
+                    new_values.append([cur_skill])
 
-                if old_values.__len__() > i:
-                    try:
-                        if cur_skill - float(old_values[i].replace(",", ".")) != 0:
+                    if old_values.__len__() > i:
+                        try:
+                            if cur_skill - float(old_values[i].replace(",", ".")) != 0:
+                                updated_skills.append((skill_names[i], old_values[i], cur_skill))
+                        except Exception as e:
                             updated_skills.append((skill_names[i], old_values[i], cur_skill))
-                    except Exception as e:
-                        updated_skills.append((skill_names[i], old_values[i], cur_skill))
+                    else:
+                        updated_skills.append((skill_names[i], 0, cur_skill))
                 else:
-                    updated_skills.append((skill_names[i], 0, cur_skill))
-            else:
-                new_values.append([])
+                    new_values.append([])
 
-        print("Write data into the table...")
-        sheet.update(player_cell, new_values)
+            print("Write data into the table...")
+            sheet.update(player_cell, new_values)
+
+            if updated_skills.__len__() > 0:
+                print("Changed skills for '" + player.player_name_print + "':")
+                for skill in updated_skills:
+                    whitespaces = " " * max(1, 25 - len(skill[0]))
+                    print("\t" + skill[0] + ": " + whitespaces + to_number(skill[1]) + " -> " + to_number(skill[2]))
+            else:
+                print("No skills changed for '" + player.player_name_print + "':")
+            print("\nWriting successful!\n")
     except Exception as e:
         print(e)
         end_program("", -1)
-    else:
-        if updated_skills.__len__() > 0:
-            print("Changed skills:")
-            for skill in updated_skills:
-                whitespaces = " " * max(1, 25 - len(skill[0]))
-                print("\t" + skill[0] + ": " + whitespaces + to_number(skill[1]) + " -> " + to_number(skill[2]))
-        else:
-            print("No skills changed")
-        print("\nWriting successful!")
-        end_program()
+    end_program()
 
 
 def to_number(value):
     return str(value).replace(".", ",")
 
 
-def search_for_newest_log(wurm_path, player_search=None) -> (str, str, datetime):
+def search_for_newest_log(wurm_path, player_search=None) -> Player:
     paths = ["gamedata/players", "players", "../gamedata/players", "../players"]
     player_name = ""
     player_log = (datetime.min, "")
@@ -132,7 +163,10 @@ def search_for_newest_log(wurm_path, player_search=None) -> (str, str, datetime)
                     player_path = full_cur_path
 
     log_path = join(player_path, player_name, "dumps", "skills." + player_log[1] + ".txt").replace("\\", "/")
-    return player_name.lower(), log_path, player_log[0]
+    if player_name != "":
+        return Player(player_name.lower(), log_path, player_log[0], True)
+    else:
+        return Player(player_search, "", "", False)
 
 
 def extract_skills(skill_path):

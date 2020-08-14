@@ -22,7 +22,7 @@ In order to collect the skills from a file, the option `Save Skills On Exit` has
 
 
 ### Google table setup
-All skills have to be in the column ``$C:$D`` (only one skill per row, you can use merged cells for parent skills).
+All skills have to be in the column `$C:$D` (only one skill per row, you can use merged cells for parent skills).
 All names have to be in the row `5`. Example:
 
 <img src="https://github.com/MSchmoecker/Wurm-Skill-Collector/blob/master/Docs/GoogleTable.png?raw=true" width="50%" />
@@ -34,6 +34,14 @@ Before the tool runs, the player name has to be written **exactly** like the ing
 
 The program can now be executed. It tries to find the newest log and write the the skill values to the table.
 The tool only runs once and has to be started manually every time new skills are collected in Wurm.
+
+### Multiple Characters
+If you want to upload skills of more than one char, you have to tell the program to explicit find them. To do this
+you have to edit the `SkillCollectorConfig.json` file. Note that the trailing comma is not allowed if it is the last line with data.
+
+```
+  "players": ["PlayerNameA", "PlayerNameB"],
+```
 
 ## Development
 ### Setup
