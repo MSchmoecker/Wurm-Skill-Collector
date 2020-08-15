@@ -99,7 +99,7 @@ def main():
 
                     if old_values.__len__() > i:
                         try:
-                            if cur_skill - float(old_values[i].replace(",", ".")) != 0:
+                            if cur_skill - float(old_values[i].replace(",", ".")) > 0:
                                 updated_skills.append((skill_names[i], old_values[i], cur_skill))
                         except Exception as e:
                             updated_skills.append((skill_names[i], old_values[i], cur_skill))
