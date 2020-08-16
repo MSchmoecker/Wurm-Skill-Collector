@@ -177,7 +177,12 @@ def extract_skills(skill_path):
         for line in lines:
             skill_line = line.strip().replace(':', '').rsplit(' ', 3)
             if skill_line.__len__() == 4 and skill_line[0] != 'Skills':
-                found_skills[skill_line[0].lower()] = max(skill_line[1], skill_line[2], skill_line[3])
+                skill = skill_line[0].lower()
+                value = max(skill_line[1], skill_line[2], skill_line[3])
+                if not found_skills.__contains__(skill):
+                    found_skills[skill] = value
+                else:
+                    found_skills[skill] = max(value, found_skills[skill])
         return found_skills
 
 
