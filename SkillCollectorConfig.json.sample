@@ -15,5 +15,6 @@
 	  "client_x509_cert_url": ""
   },
   "date_row_name": "date",
-  "date_format": "%d.%m.%Y"
+  "date_format": "%d.%m.%Y",
+  "skill_columns": "C:D"
 }

@@ -28,6 +28,9 @@ def init():
     if not conf.__contains__("date_format"):
         conf["date_format"] = "%d.%m.%Y"
         is_dirty = True
+    if not conf.__contains__("skill_columns"):
+        conf["skill_columns"] = "C:D"
+        is_dirty = True
 
     if is_dirty:
         with open(config_path, 'w', encoding='utf-8') as data:
@@ -42,6 +45,7 @@ class Player:
         self.log_path = log_path
         self.date = date
         self.found = found
+        self.skills = None
     player_name: ""
 
 
@@ -86,8 +90,20 @@ def main():
 
         all_values = sheet.get_all_values()
 
-        skill_names = [row[3] if row[3] > row[2] else row[2] for row in all_values]
+        skill_names = []
+        skill_range_indexes = utils.a1_range_to_grid_range(config["skill_columns"])
+        range_start_index = skill_range_indexes["startColumnIndex"]
+        range_end_index = skill_range_indexes["endColumnIndex"]
+
+        for row in all_values:
+            for i in range(range_start_index, range_end_index):
+                if players[0].skills.__contains__(row[i].lower()):
+                    skill_names.append(row[i].lower())
+                    break
+            else:
+                skill_names.append("")
         names = []
+
         for single_name in all_values[4]:
             names.append(single_name.lower())
 
@@ -121,7 +137,6 @@ def main():
                         updated_skills.append((skill_names[i], 0, cur_skill))
                 elif skill_names[i].lower() == config["date_row_name"]:
                     new_values.append([datetime.now().strftime(config["date_format"])])
-                    print(datetime.now().strftime(config["date_format"]))
                 else:
                     new_values.append([])
 
