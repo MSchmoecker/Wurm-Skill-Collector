@@ -18,7 +18,21 @@ def init():
     else:
         print("SkillCollectorConfig.json loaded")
     with open(config_path, 'r', encoding='utf-8') as data:
-        return json.load(data)
+        conf: dict = json.load(data)
+
+    # Writing default values to the config file if the key don't exists
+    is_dirty = False
+    if not conf.__contains__("date_row_name"):
+        conf["date_row_name"] = "datum"
+        is_dirty = True
+    if not conf.__contains__("date_format"):
+        conf["date_format"] = "%d.%m.%Y"
+        is_dirty = True
+
+    if is_dirty:
+        with open(config_path, 'w', encoding='utf-8') as data:
+            json.dump(conf, data, indent=2)
+    return conf
 
 
 class Player:
@@ -105,6 +119,9 @@ def main():
                             updated_skills.append((skill_names[i], old_values[i], cur_skill))
                     else:
                         updated_skills.append((skill_names[i], 0, cur_skill))
+                elif skill_names[i].lower() == config["date_row_name"]:
+                    new_values.append([datetime.now().strftime(config["date_format"])])
+                    print(datetime.now().strftime(config["date_format"]))
                 else:
                     new_values.append([])
 

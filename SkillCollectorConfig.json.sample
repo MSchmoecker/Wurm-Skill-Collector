@@ -13,5 +13,7 @@
 	  "token_uri": "https://oauth2.googleapis.com/token",
 	  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
 	  "client_x509_cert_url": ""
-  }
+  },
+  "date_row_name": "date",
+  "date_format": "%d.%m.%Y"
 }
