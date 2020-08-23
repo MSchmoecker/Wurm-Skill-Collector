@@ -46,6 +46,7 @@ class Player:
         self.date = date
         self.found = found
         self.skills = None
+
     player_name: ""
 
 
@@ -53,16 +54,19 @@ def main():
     try:
         print("Search for skill files...\n")
 
+        # Loading player names from config file
         if config.__contains__("players"):
             player_names = config["players"]
         else:
             player_names = None
 
+        # Searching throw player files
         if player_names is None or player_names.__len__() == 0:
             players = [search_for_newest_log(data_path)]
         else:
             players = [search_for_newest_log(data_path, player_name) for player_name in player_names]
 
+        # Extracting all players
         any_found = False
         for player in players:
             if player.found:
@@ -90,23 +94,27 @@ def main():
 
         all_values = sheet.get_all_values()
 
-        skill_names = []
+        skill_rows = []
+        names = []
+
         skill_range_indexes = utils.a1_range_to_grid_range(config["skill_columns"])
         range_start_index = skill_range_indexes["startColumnIndex"]
         range_end_index = skill_range_indexes["endColumnIndex"]
 
+        # Preparing skill rows
         for row in all_values:
             for i in range(range_start_index, range_end_index):
                 if players[0].skills.__contains__(row[i].lower()) or config["date_row_name"].lower() == row[i].lower():
-                    skill_names.append(row[i].lower())
+                    skill_rows.append(row[i].lower())
                     break
             else:
-                skill_names.append("")
-        names = []
+                skill_rows.append("")
 
+        # Preparing names
         for single_name in all_values[4]:
             names.append(single_name.lower())
 
+        # Writing player skills in table
         for player in players:
             if not player.found:
                 continue
@@ -122,32 +130,34 @@ def main():
             new_values = []
             updated_skills = []
 
-            for i in range(len(skill_names)):
-                if skill_names.__len__() > i and player.skills.__contains__(skill_names[i].lower()):
-                    cur_skill = round(float(player.skills[skill_names[i].lower()]) * 100) / 100
+            # Set all rows of the player column
+            for i in range(len(skill_rows)):
+                if skill_rows.__len__() > i and player.skills.__contains__(skill_rows[i].lower()):
+                    cur_skill = round(float(player.skills[skill_rows[i].lower()]) * 100) / 100
                     new_values.append([cur_skill])
 
                     if old_values.__len__() > i:
                         try:
                             if cur_skill - float(old_values[i].replace(",", ".")) > 0:
-                                updated_skills.append((skill_names[i], old_values[i], cur_skill))
+                                updated_skills.append((skill_rows[i], old_values[i], cur_skill))
                         except Exception as e:
-                            updated_skills.append((skill_names[i], old_values[i], cur_skill))
+                            updated_skills.append((skill_rows[i], old_values[i], cur_skill))
                     else:
-                        updated_skills.append((skill_names[i], 0, cur_skill))
-                elif skill_names[i].lower() == config["date_row_name"]:
+                        updated_skills.append((skill_rows[i], 0, cur_skill))
+                elif skill_rows[i].lower() == config["date_row_name"]:
                     new_values.append([datetime.now().strftime(config["date_format"])])
                 else:
                     new_values.append([])
 
-            print("Write data into the table...")
+            print("Writing data into the table...")
             sheet.update(player_cell, new_values)
 
+            # Print changed skills
             if updated_skills.__len__() > 0:
                 print("Changed skills for '" + player.player_name_print + "':")
                 for skill in updated_skills:
                     whitespaces = " " * max(1, 25 - len(skill[0]))
-                    print("\t" + skill[0] + ": " + whitespaces + to_number(skill[1]) + " -> " + to_number(skill[2]))
+                    print("\t" + skill[0].capitalize() + ": " + whitespaces + to_number(skill[1]) + " -> " + to_number(skill[2]))
             else:
                 print("No skills changed for '" + player.player_name_print + "':")
             print("\nWriting successful!\n")
