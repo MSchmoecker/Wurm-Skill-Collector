@@ -97,7 +97,7 @@ def main():
 
         for row in all_values:
             for i in range(range_start_index, range_end_index):
-                if players[0].skills.__contains__(row[i].lower()):
+                if players[0].skills.__contains__(row[i].lower()) or config["date_row_name"].lower() == row[i].lower():
                     skill_names.append(row[i].lower())
                     break
             else:
