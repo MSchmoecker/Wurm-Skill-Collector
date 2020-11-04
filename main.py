@@ -7,6 +7,7 @@ import gspread
 from gspread import utils
 from oauth2client.service_account import ServiceAccountCredentials
 import sys
+import re
 
 data_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -39,47 +40,27 @@ def init():
 
 
 class Player:
-    def __init__(self, player_name, log_path, date, found):
+    def __init__(self, player_name, log_path, date):
         self.player_name = player_name
         self.player_name_print = player_name.capitalize()
-        self.log_path = log_path
         self.date = date
-        self.found = found
-        self.skills = None
-
-    player_name: ""
+        self.skills = extract_skills(log_path)
 
 
 def main():
     try:
-        print("Search for skill files...\n")
+        print("Extract all skill files...\n")
+        players = extract_all_logs(data_path)
 
-        # Loading player names from config file
-        if config.__contains__("players"):
-            player_names = config["players"]
-        else:
-            player_names = None
-
-        # Searching throw player files
-        if player_names is None or player_names.__len__() == 0:
-            players = [search_for_newest_log(data_path)]
-        else:
-            players = [search_for_newest_log(data_path, player_name) for player_name in player_names]
-
-        # Extracting all players
         any_found = False
         for player in players:
-            if player.found:
-                print("Latest skills for '" + player.player_name_print + "' on '" + str(player.date) + "' found")
-                player.skills = extract_skills(player.log_path)
+            print("Latest skills for '" + player.player_name_print + "' on '" + str(player.date) + "' found")
 
-                if player.skills.__len__() == 0:
-                    print("\tNo skills found inside the file!")
-                    player.found = False
-                else:
-                    any_found = True
-            elif player.player_name is not None:
-                print("No skill file found for '" + player.player_name_print + "'")
+            if player.skills.__len__() == 0:
+                print("\tNo skills found inside the file!")
+                player.found = False
+            else:
+                any_found = True
 
         if not any_found:
             end_program("\nNo skill files found!")
@@ -116,10 +97,7 @@ def main():
 
         # Writing player skills in table
         for player in players:
-            if not player.found:
-                continue
             if not names.__contains__(player.player_name):
-                print("Player '" + player.player_name_print + " not found inside the table! (Row 5)")
                 continue
 
             print("\nPreparing data...")
@@ -158,9 +136,9 @@ def main():
                 for skill in updated_skills:
                     whitespaces = " " * max(1, 25 - len(skill[0]))
                     print("\t" + skill[0].capitalize() + ": " + whitespaces + to_number(skill[1]) + " -> " + to_number(skill[2]))
+                print("\nWriting successful!\n")
             else:
-                print("No skills changed for '" + player.player_name_print + "':")
-            print("\nWriting successful!\n")
+                print("No skills changed for '" + player.player_name_print + "'")
     except Exception as e:
         print(e)
         end_program("", -1)
@@ -171,11 +149,9 @@ def to_number(value):
     return str(value).replace(".", ",")
 
 
-def search_for_newest_log(wurm_path, player_search=None) -> Player:
+def extract_all_logs(wurm_path) -> list:
     paths = ["gamedata/players", "players", "../gamedata/players", "../players"]
-    player_name = ""
-    player_log = (datetime.min, "")
-    player_path = ""
+    players = []
 
     for cur_path in paths:
         full_cur_path = join(wurm_path, cur_path)
@@ -184,31 +160,24 @@ def search_for_newest_log(wurm_path, player_search=None) -> Player:
                 full_player_path = join(full_cur_path, player_folder)
                 full_dumps_path = join(full_player_path, "dumps")
 
-                if player_search is not None and player_folder != player_search:
-                    continue
                 if not isdir(full_player_path):
                     continue
                 if not exists(full_dumps_path):
                     continue
-                logs = [log.replace("skills.", "").replace(".txt", "") for log in listdir(full_dumps_path)
-                        if (isfile(join(full_dumps_path, log)) and log.startswith("skills"))]
-                times = []
-                for log in logs:
-                    try:
-                        times.append((datetime.strptime(log.strip(), "%Y%m%d.%H%M"), log))
-                    except Exception as e:
-                        pass
-                times.sort(reverse=True)
-                if times.__len__() > 0 and times[0][0] > player_log[0]:
-                    player_name = player_folder
-                    player_log = times[0]
-                    player_path = full_cur_path
 
-    log_path = join(player_path, player_name, "dumps", "skills." + player_log[1] + ".txt").replace("\\", "/")
-    if player_name != "":
-        return Player(player_name.lower(), log_path, player_log[0], True)
-    else:
-        return Player(player_search, "", "", False)
+                times = []
+
+                for file in listdir(full_dumps_path):
+                    if not isfile(join(full_dumps_path, file)):
+                        continue
+                    if bool(re.match("^skills\\.[0-9]{8}\\.[0-9]{4}\\.txt$", file)):
+                        times.append((datetime.strptime(file[7:20], "%Y%m%d.%H%M"), file))
+
+                if times.__len__() > 0:
+                    times.sort(reverse=True)
+                    log_path = join(full_cur_path, player_folder, "dumps", times[0][1]).replace("\\", "/")
+                    players.append(Player(player_folder.lower(), log_path, times[0][0]))
+    return players
 
 
 def extract_skills(skill_path):
