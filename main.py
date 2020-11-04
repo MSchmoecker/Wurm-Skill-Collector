@@ -123,7 +123,7 @@ def main():
                     else:
                         updated_skills.append((skill_rows[i], 0, cur_skill))
                 elif skill_rows[i].lower() == config["date_row_name"]:
-                    new_values.append([datetime.now().strftime(config["date_format"])])
+                    new_values.append([player.date.strftime(config["date_format"])])
                 else:
                     new_values.append([])
 
