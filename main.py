@@ -21,21 +21,15 @@ def init():
     with open(config_path, 'r', encoding='utf-8') as data:
         conf: dict = json.load(data)
 
-    # Writing default values to the config file if the key don't exists
-    is_dirty = False
-    if not conf.__contains__("date_row_name"):
-        conf["date_row_name"] = "datum"
-        is_dirty = True
-    if not conf.__contains__("date_format"):
-        conf["date_format"] = "%d.%m.%Y"
-        is_dirty = True
-    if not conf.__contains__("skill_columns"):
-        conf["skill_columns"] = "C:D"
-        is_dirty = True
+    # Write default values to the config file if the key don't exists
+    conf["sheet_id"] = conf.setdefault("sheet_id", "")
+    conf["worksheet_name"] = conf.setdefault("worksheet_name", "")
+    conf["date_row_name"] = conf.setdefault("date_row_name", "datum")
+    conf["date_format"] = conf.setdefault("date_format", "%d.%m.%Y")
+    conf["skill_columns"] = conf.setdefault("skill_columns", "C:D")
 
-    if is_dirty:
-        with open(config_path, 'w', encoding='utf-8') as data:
-            json.dump(conf, data, indent=2)
+    with open(config_path, 'w+', encoding='utf-8') as data:
+        json.dump(conf, data, indent=2)
     return conf
 
 
