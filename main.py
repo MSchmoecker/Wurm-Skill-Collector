@@ -9,8 +9,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 import sys
 import re
 
-data_path = os.path.dirname(os.path.realpath(__file__))
-
 
 def init():
     config_path = join(data_path, "SkillCollectorConfig.json")
@@ -199,5 +197,7 @@ def end_program(reason="", exit_code=0):
     sys.exit(exit_code)
 
 
-config = init()
-main()
+if __name__ == '__main__':
+    data_path = os.path.dirname(os.path.realpath(__file__))
+    config = init()
+    main()
