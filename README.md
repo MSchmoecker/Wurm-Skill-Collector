@@ -32,16 +32,9 @@ Before the tool runs, the player name has to be written **exactly** like the ing
 
 ![](https://github.com/MSchmoecker/Wurm-Skill-Collector/blob/master/Docs/ProgramSample.png?raw=true)
 
-The program can now be executed. It tries to find the newest log and write the the skill values to the table.
+The program can now be executed. It tries to find the newest log and write the skill values into the table.
+If you have multiple chars all of them are used if there names exists in the table.
 The tool only runs once and has to be started manually every time new skills are collected in Wurm.
-
-### Multiple Characters
-If you want to upload skills of more than one char, you have to tell the program to explicit find them. To do this
-you have to edit the `SkillCollectorConfig.json` file. Note that the trailing comma is not allowed if it is the last line with data.
-
-```
-  "players": ["PlayerNameA", "PlayerNameB"],
-```
 
 ## Development
 ### Setup
